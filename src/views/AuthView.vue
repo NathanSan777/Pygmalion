@@ -66,7 +66,7 @@
                                 </div>
                             </form>
                             <br>
-                                <button @click="printRegister()" :disabled="!isRegistrationComplete" class="btn btn-primary" >Register</button>
+                                <button @click="register()" :disabled="!isRegistrationComplete" class="btn btn-primary" >Register</button>
                             </div>
                         </div>
                     </div>
@@ -78,6 +78,10 @@
 
   <script>
   import { mapActions } from 'pinia'
+  import { auth } from "../Firebase/init.js"
+  import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
+  import db from '../Firebase/init.js'
+  import { doc, collection, addDoc } from 'firebase/firestore'
 //   import { useStoreAuth } from '../stores/storeAuth'
 
 
@@ -87,13 +91,48 @@
         activeTab: 'login', // Default active tab is login
         loginEmail: "",
         loginPassword: "",
+
         registrationUsername: "",
         registrationEmail: "",
-        registrationPassword: ""
+        registrationPassword: "",
 
+        userID: "",
       };
     },
     methods: {
+    //    addUser(user){
+    //         addDoc(db, 'users', {
+    //             email: this.registrationEmail,
+    //             name: this.registrationUsername,
+    //             password: this.registrationPassword,
+    //             userID: user.uid
+            
+    //         },
+    //         console.log("User added!"));
+    //     },
+    async addUser(user) {
+    try {
+        await addDoc(collection(db, 'users'), {
+            email: this.registrationEmail,
+            name: this.registrationUsername,
+            password: this.registrationPassword,
+            userID: user.uid
+        });
+        console.log("User added successfully");
+    } catch (error) {
+        console.error("Error adding user: ", error);
+    }
+},
+        register(){
+            createUserWithEmailAndPassword(auth, this.registrationEmail, this.registrationPassword)
+                .then((userCredential) => {
+                    const user = userCredential.user
+                    this.addUser(user);
+                }).catch((error) =>{
+                    console.log(error.message)
+                })
+        },
+
         onToggle(tab){
             if (this.activeTab !== tab) {
                 this.activeTab = tab;

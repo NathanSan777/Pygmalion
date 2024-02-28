@@ -6,7 +6,8 @@ import { RouterLink, RouterView } from 'vue-router'
   <video autoplay muted loop id="backgroundVideo">
     <source src="./assets/beach.mp4" type="video/mp4">
   </video>
-  <RouterView/>
+  <RouterView
+  name="login"/>
 </template>
 
 <style scoped>
