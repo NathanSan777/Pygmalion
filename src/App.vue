@@ -1,13 +1,30 @@
-<script setup>
+<script>
 import { RouterLink, RouterView } from 'vue-router'
+import { useStoreAuth } from './stores/storeAuth'
+import DashboardComponent from './components/DashboardComponent.vue';
+
+export default {
+  components:{
+    DashboardComponent
+  }, 
+  setup() {
+    const authStore = useStoreAuth();
+    return { authStore };
+  }
+}
+
 </script>
 
 <template>
   <video autoplay muted loop id="backgroundVideo">
     <source src="./assets/beach.mp4" type="video/mp4">
   </video>
-  <RouterView
-  name="login"/>
+  <template v-if="!authStore.getLogInStatus">
+    <RouterView/>
+  </template>
+  <template v-else>
+    <DashboardComponent></DashboardComponent>
+  </template>
 </template>
 
 <style scoped>

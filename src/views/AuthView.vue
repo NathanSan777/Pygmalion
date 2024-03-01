@@ -40,7 +40,7 @@
                                 </div>
                             </form>
                             <br>
-                                <button @click="printSubmit()" :disabled="!isLoginComplete" class="btn btn-primary" style="">Login</button>
+                                <button @click="login()" :disabled="!isLoginComplete" class="btn btn-primary" style="">Login</button>
                             </div>
                             <div v-if="activeTab === 'register'" class="tab-pane fade show active">
                             <h3 style="margin: auto; text-align: center;">Glad you're joining!</h3>
@@ -77,12 +77,12 @@
   
 
   <script>
-  import { mapActions } from 'pinia'
-  import { auth } from "../Firebase/init.js"
-  import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
-  import db from '../Firebase/init.js'
-  import { doc, collection, addDoc } from 'firebase/firestore'
-//   import { useStoreAuth } from '../stores/storeAuth'
+//   import { mapActions } from 'pinia'
+//   import { auth } from "../Firebase/init.js"
+//   import { createUserWithEmailAndPassword} from "firebase/auth"
+//   import db from '../Firebase/init.js'
+//   import { doc, collection, addDoc } from 'firebase/firestore'
+  import { useStoreAuth } from '../stores/storeAuth'
 
 
   export default {
@@ -95,59 +95,30 @@
         registrationUsername: "",
         registrationEmail: "",
         registrationPassword: "",
-
-        userID: "",
       };
     },
     methods: {
-    //    addUser(user){
-    //         addDoc(db, 'users', {
-    //             email: this.registrationEmail,
-    //             name: this.registrationUsername,
-    //             password: this.registrationPassword,
-    //             userID: user.uid
-            
-    //         },
-    //         console.log("User added!"));
-    //     },
-    async addUser(user) {
-    try {
-        await addDoc(collection(db, 'users'), {
-            email: this.registrationEmail,
-            name: this.registrationUsername,
-            password: this.registrationPassword,
-            userID: user.uid
-        });
-        console.log("User added successfully");
-    } catch (error) {
-        console.error("Error adding user: ", error);
-    }
-},
-        register(){
-            createUserWithEmailAndPassword(auth, this.registrationEmail, this.registrationPassword)
-                .then((userCredential) => {
-                    const user = userCredential.user
-                    this.addUser(user);
-                }).catch((error) =>{
-                    console.log(error.message)
-                })
-        },
+        async register(){
+            try {
+                await useStoreAuth().register(this.registrationEmail, this.registrationPassword, this.registrationUsername)
+            } catch(error) {
+                console.error("registration failed:  ", error);
 
+            }
+        },
+        async login(){
+            try {
+                await useStoreAuth().login(this.loginEmail, this.loginPassword);
+            } catch(error){
+                console.error("Login failed:  ", error.message);
+            }
+        },
         onToggle(tab){
             if (this.activeTab !== tab) {
                 this.activeTab = tab;
                 console.log("Currently on the " + tab + " page...");
             }     
-        },
-        printSubmit(){
-            console.log("The current login  email is ", this.loginEmail);
-            console.log("The current login password is ", this.loginPassword);
-        },
-        printRegister(){
-            console.log("The current registration username is ", this.registrationUsername);
-            console.log("The current registration email is ", this.registrationEmail);
-            console.log("The current registration password is ", this.registrationPassword);
-        },     
+        }, 
     },
     computed: {
         isLoginComplete(){
