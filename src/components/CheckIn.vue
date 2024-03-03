@@ -1,5 +1,8 @@
 <template>
-    <p>Check-In Vue</p>
+    <div class="card">
+          <p>You're currently in the Check-in view!</p>
+          <p>Soon to be implemented!</p>
+        </div>
 </template>
 
 <script>

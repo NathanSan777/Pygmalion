@@ -1,5 +1,8 @@
 <template>
-    <p>Breathe Vue</p>
+    <div class="card">
+          <p>You're currently in the Breathe view!</p>
+          <p>Soon to be implemented!</p>
+        </div>
 </template>
 
 <script>

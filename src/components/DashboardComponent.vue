@@ -15,24 +15,56 @@
       <div v-else>
         <p>No user logged in.</p>
       </div>
-
-      
+      <br>
+      <div v-if="getCurrentLocation === 'checkIn'">
+        <CheckIn></CheckIn>
+      </div>
+      <div v-else-if="getCurrentLocation === 'journal'">
+        <Journal></Journal>
+      </div>
+      <div v-else-if="getCurrentLocation === 'statistics'">
+        <Statistics></Statistics>
+      </div>
+      <div v-else-if="getCurrentLocation === 'breathe'">
+        <Breath></Breath>
+      </div>
+      <div v-else-if="getCurrentLocation === 'forum'">
+        <Forum></Forum>
+      </div>
+      <div v-else-if="getCurrentLocation === 'userSettings'">
+        <UserSettings></UserSettings>
+      </div>
     </div>
   </template>
   
 <script>
 import { useRouter, RouterLink, RouterView } from 'vue-router'
 import { useStoreAuth } from '../stores/storeAuth'
+import { useNavigationStore } from '../stores/navigationStore';
 import Sidebar from '../components/Sidebar.vue';
-  
+import CheckIn from './CheckIn.vue';
+import Journal from './Journal.vue';
+import Statistics from './Statistics.vue';
+import Breath from './Breath.vue';
+import Forum from './Forum.vue';
+import UserSettings from './UserSettings.vue'
+
+
   export default {
     components: {
-      Sidebar
+      Sidebar,
+      CheckIn,
+      Journal,
+      Statistics,
+      Breath,
+      Forum,
+      UserSettings
     },
     data() {
         return {
             currentUser: null,
-            userDataDoc: null
+            userDataDoc: null,
+            currentLocation: "checkIn"
         };
     },
     methods: {
@@ -52,7 +84,8 @@ import Sidebar from '../components/Sidebar.vue';
     },
     setup() {
         const router = useRouter();
-        return { router };
+        const navigationStore = useNavigationStore();
+        return { router, navigationStore };
     },
     created() {
         this.currentUser = useStoreAuth().getCurrentUser;
@@ -61,6 +94,9 @@ import Sidebar from '../components/Sidebar.vue';
     computed: {
         hasCurrentUser() {
             return useStoreAuth().getCurrentUser !== null;
+        },
+        getCurrentLocation(){
+          return this.navigationStore.currentLocation;
         }
     }
 }

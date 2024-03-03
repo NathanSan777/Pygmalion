@@ -3,6 +3,7 @@ import { auth } from "../Firebase/init.js"
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { query, where, doc, addDoc, collection, getDocs, onSnapshot } from 'firebase/firestore';
 import db from '../Firebase/init.js'
+import { useNavigationStore } from "./navigationStore.js";
 
 export const useStoreAuth = defineStore("storeAuth", {
     id: 'auth',
@@ -100,6 +101,7 @@ export const useStoreAuth = defineStore("storeAuth", {
                 console.log("Attempting to sign user out...")
                 await auth.signOut();
                 console.log("Received confirmation.")
+                useNavigationStore().setCurrentLocation('checkIn');
                 this.isLoggedIn = false;
                 this.user = null;
                 this.userData = null;

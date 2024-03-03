@@ -1,5 +1,8 @@
 <template>
-    <p>Journal Vue</p>
+    <div class="card">
+          <p>You're currently in the Journal view!</p>
+          <p>Soon to be implemented!</p>
+        </div>
 </template>
 
 <script>

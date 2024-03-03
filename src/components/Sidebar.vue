@@ -15,67 +15,81 @@
         <ul style="display: flex; flex-direction: column; justify-content: center; padding-left: 0;"  >
             <div class="button-format">
                 <div class="button-styling" >
-                    <button class="sidebar-button check-in">
+                    <button class="sidebar-button check-in" @click="handleButtonClick('checkIn')">
                         <span class="material-symbols-outlined" id="icon" style="margin-right:2px; font-size: 45px;">check_circle</span>
                         <li>Check-In</li>
                     </button>
                 </div>
             </div>
-            <br>
+            
             <div class="button-format">
                 <div class="button-styling">
-                    <button class="sidebar-button journal">
+                    <button class="sidebar-button journal" @click="handleButtonClick('journal')">
                         <span class="material-symbols-outlined" id="icon" style="margin-right:2px; font-size: 45px;">book</span>
                         <li>Journal</li>
                     </button>
                 </div>
             </div>
-            <br>
+            
             <div class="button-format">
                 <div class="button-styling">
-                    <button class="sidebar-button statistics">
+                    <button class="sidebar-button statistics" @click="handleButtonClick('statistics')">
                         <span class="material-symbols-outlined" id="icon" style="margin-right:2px; font-size: 45px;">bar_chart</span>
                         <li>Statistics</li>
                     </button>
                 </div>
             </div>
-            <br>
+            
             <div class="button-format">
                 <div class="button-styling">
-                    <button class="sidebar-button breathe">
+                    <button class="sidebar-button breathe" @click="handleButtonClick('breathe')">
                         <span class="material-symbols-outlined" id="icon" style="margin-right:2px;font-size: 45px; ">airwave</span>
                         <li>Breathe</li>
                     </button>
                 </div>
             </div>
-            <br>
+            
             <div class="button-format">
                 <div class="button-styling">
-                    <button class="sidebar-button forum">
+                    <button class="sidebar-button forum" @click="handleButtonClick('forum')">
                         <span class="material-symbols-outlined" id="icon" style="margin-right:2px;font-size: 45px; ">forum</span>
                         <li>Forum</li>
                     </button>
                 </div>
             </div>
-            <br>
+            
+            <div class="button-format">
+                <div class="button-styling">
+                    <button class="sidebar-button settings" @click="handleButtonClick('userSettings')">
+                        <span class="material-symbols-outlined" id="icon" style="margin-right:2px;font-size: 45px; ">settings</span>
+                        <li>Settings</li>
+                    </button>
+                </div>
+            </div>
         </ul>
     </div>
 </div>
 </template> 
 
 <script>
+import { useNavigationStore } from '../stores/navigationStore'
+
 
 export default {
     data() {
         return {
             name: 'Sidebar',
             isCollapsed: true,
-            selectedButton: 'CheckIn'
+            selectedButton: 'checkIn'
         };
     },
     methods: {
         toggleSidebar() {
             this.isCollapsed = !this.isCollapsed;
+        },
+        handleButtonClick(location){
+            const navigationStore = useNavigationStore();
+            navigationStore.setCurrentLocation(location);
         }
     },
 }
@@ -125,6 +139,7 @@ export default {
     text-align: center; 
     display: block;  
     margin: auto;
+    margin-bottom: 20px;
     box-shadow: 0 0 30px rgba(182, 208, 226, 0.2);
 }
 .sidebar-button:hover{
@@ -133,23 +148,21 @@ export default {
 }
 .sidebar-button.check-in:hover{
     background-color: lightpink; 
-    backdrop-filter: blur(30px); 
 }
 .sidebar-button.journal:hover{
     background-color:royalblue;
-    backdrop-filter: blur(30px); 
 }
 .sidebar-button.statistics:hover{
-    background-color:forestgreen;
-    backdrop-filter: blur(30px); 
+    background-color:forestgreen; 
 }
 .sidebar-button.breathe:hover{
     background-color:purple;
-    backdrop-filter: blur(30px); 
 }
 .sidebar-button.forum:hover{
     background-color:goldenrod;
-    backdrop-filter: blur(30px); 
+}
+.sidebar-button.settings:hover{
+    background-color:grey; 
 }
 .sidebar-button:active,
 .sidebar-button.selected {
@@ -183,7 +196,6 @@ export default {
     background-color: rgba(0, 0, 0, 0.1);
     transition: 1s;
 }
-/* New styling for the toggler bars */
 .icon-bar {
   display: block;
   width: 22px;
@@ -203,7 +215,6 @@ export default {
   transform: translateY(-6px) rotate(-45deg);
 }
 
-
 h1{
     color: black;
     font-weight: 880;
@@ -219,7 +230,4 @@ ul li {
 span #icon{
     position: right;
 }
-
-
-
 </style>

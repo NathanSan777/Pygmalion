@@ -1,6 +1,6 @@
 <template>
     <div class="card">
-          <p>You're currently in the Forum view!</p>
+          <p>You're currently in the User Settings view!</p>
           <p>Soon to be implemented!</p>
         </div>
 </template>
