@@ -45,6 +45,8 @@ export const useStoreAuth = defineStore("storeAuth", {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 const userData = await this.fetchUserData(user.uid);
+                this.isLoggedIn = true;
+                this.user = user;
 
                 if (userData){
                     this.userData = userData;
@@ -54,8 +56,6 @@ export const useStoreAuth = defineStore("storeAuth", {
                     console.error("User data not found for user ID:", user.uid)
                 }
                 
-                this.isLoggedIn = true;
-                this.user = user;
                 console.log("User logged in: ", userCredential.user);
                 console.log("Email is ", userCredential.email)
             } catch(error){
@@ -79,13 +79,9 @@ export const useStoreAuth = defineStore("storeAuth", {
             } catch(error) {
                 console.error("Error fetching user data: ", error);
                 throw error;
-
             }
-        }
         },
-        setCurrentUser(user){
-            this.currentUser = user;
-        },
+
         async initializeAuthState(){
             auth.onAuthStateChanged(user => {
                 if (user) {
@@ -96,27 +92,53 @@ export const useStoreAuth = defineStore("storeAuth", {
                     this.isLoggedIn = false;
                     this.user = null;
                 }
-            })
+            });
         },
+        async logOutUser(){
+            console.log("Attempting try-catch statement")
+            try {
+                console.log("Attempting to sign user out...")
+                await auth.signOut();
+                console.log("Received confirmation.")
+                this.isLoggedIn = false;
+                this.user = null;
+                this.userData = null;
+                console.log("User logged out.")
+            } catch(error) {
+                console.error("Failed to log out user",  error);
+                throw error;
+            }
+        }
+    },
+    
     getters: {
         getLogInStatus(){
-            return this.isLoggedIn;
+            if (this.isLoggedIn){
+                return this.isLoggedIn;
+            }
         },
         getCurrentUser(){
             return this.isLoggedIn ? this.user : null;
         },
         getUserDataDoc(){
-            return this.userData
+            if (this.isLoggedIn){
+                return this.userData
+            }
         },
         getCurrentUserName(){
-            return this.userData.name;
+            if (this.isLoggedIn){
+                return this.userData.name;
+            }
         },
         getCurrentUserEmail(){
-            return this.userData.email;
+            if (this.isLoggedIn){
+                return this.userData.email;
+            }
         },
         getCurrentUserID(){
-            return this.userData.uid;
+            if (this.isLoggedIn){
+                return this.userData.uid;
+            }
         }
     }
-
 })

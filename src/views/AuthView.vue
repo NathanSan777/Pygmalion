@@ -49,7 +49,7 @@
                                 <div class="form-group">
                                     <div class="input-box">
                                         <input type="email" class="form-control" v-model="registrationUsername" aria-describedby="emailHelp" placeholder="Username">
-                                        <span class="material-symbols-outlined" style="margin-left: 2px;">person</span>
+                                        <span class="material-symbols-outlined" style="margin-left: 2px; ">person</span>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -83,24 +83,28 @@
 //   import db from '../Firebase/init.js'
 //   import { doc, collection, addDoc } from 'firebase/firestore'
   import { useStoreAuth } from '../stores/storeAuth'
-
-
+  import { useRouter} from 'vue-router'
   export default {
     data() {
       return {
         activeTab: 'login', // Default active tab is login
-        loginEmail: "",
-        loginPassword: "",
+        loginEmail: "nathan@gmail.com",
+        loginPassword: "testing1",
 
         registrationUsername: "",
         registrationEmail: "",
         registrationPassword: "",
       };
     },
+    setup(){
+        const router = useRouter();
+        return { router };
+    },
     methods: {
         async register(){
             try {
                 await useStoreAuth().register(this.registrationEmail, this.registrationPassword, this.registrationUsername)
+                this.router.push('/dashboard')
             } catch(error) {
                 console.error("registration failed:  ", error);
 
@@ -109,8 +113,10 @@
         async login(){
             try {
                 await useStoreAuth().login(this.loginEmail, this.loginPassword);
+                this.router.push('/dashboard')
             } catch(error){
                 console.error("Login failed:  ", error.message);
+                alert("Login failed! Please check the email or password you submitted.")
             }
         },
         onToggle(tab){

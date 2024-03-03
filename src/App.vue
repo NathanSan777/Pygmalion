@@ -1,31 +1,42 @@
+<template>
+  <video autoplay muted loop id="backgroundVideo">
+    <source src="./assets/beach.mp4" type="video/mp4">
+  </video>
+
+  <template v-if="!authStore.isLoggedIn">
+    <!-- <RouterView/> -->
+    <router-view></router-view>
+  </template>
+
+  <template v-else>
+    <DashboardComponent></DashboardComponent>
+  </template>
+
+</template>
+
 <script>
-import { RouterLink, RouterView } from 'vue-router'
+import { onMounted } from 'vue'
+import { useRouter, RouterLink, RouterView } from 'vue-router'
 import { useStoreAuth } from './stores/storeAuth'
 import DashboardComponent from './components/DashboardComponent.vue';
 
 export default {
   components:{
-    DashboardComponent
+    DashboardComponent,
+    RouterView,
+    RouterLink
   }, 
   setup() {
     const authStore = useStoreAuth();
-    return { authStore };
-  }
+    const router = useRouter();
+    onMounted(() => {
+      router.push('/auth')
+    })
+    return { router, authStore };
+  },
 }
 
 </script>
-
-<template>
-  <video autoplay muted loop id="backgroundVideo">
-    <source src="./assets/beach.mp4" type="video/mp4">
-  </video>
-  <template v-if="!authStore.getLogInStatus">
-    <RouterView/>
-  </template>
-  <template v-else>
-    <DashboardComponent></DashboardComponent>
-  </template>
-</template>
 
 <style scoped>
 
@@ -44,11 +55,11 @@ export default {
   margin-top: 2rem;
 } */
 
-nav a {
+/* nav a {
   display: inline-block;
   padding: 0 1rem;
   border-left: 1px solid var(--color-border);
-}
+} */
 
 nav a:first-of-type {
   border: 0;
