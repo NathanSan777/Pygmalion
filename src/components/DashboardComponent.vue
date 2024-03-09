@@ -7,9 +7,7 @@
       <!-- Your component's template -->
       <div v-if="hasCurrentUser != null">
         <div class="card">
-          <p v-if="userDataDoc">Welcome, {{ userDataDoc.username }}!</p>
-          <p v-if="currentUser">Email: {{ userDataDoc.email }}</p>
-          <button v-if="hasCurrentUser" @click="handleLogout" class="btn btn-primary">Logout</button>
+          <p v-if="userDataDoc" style="margin-bottom: none;">Welcome, {{ userDataDoc.username }}!</p>
         </div>
       </div>
       <div v-else>
@@ -34,7 +32,16 @@
       <div v-else-if="getCurrentLocation === 'userSettings'">
         <UserSettings></UserSettings>
       </div>
+      <div v-else-if="getCurrentLocation === 'logout'">
+        <LogOut></LogOut>
+        <br>
+        <div class="card">
+          <button @click="handleLogout" class="btn btn-primary">Log out</button>
+        </div>
+      </div>
     </div>
+    <br>
+    <br>
   </template>
   
 <script>
@@ -48,6 +55,7 @@ import Statistics from './Statistics.vue';
 import Breath from './Breath.vue';
 import Forum from './Forum.vue';
 import UserSettings from './UserSettings.vue'
+import LogOut from "./LogOut.vue";
 
 
   export default {
@@ -58,7 +66,8 @@ import UserSettings from './UserSettings.vue'
       Statistics,
       Breath,
       Forum,
-      UserSettings
+      UserSettings,
+      LogOut
     },
     data() {
         return {
@@ -97,12 +106,16 @@ import UserSettings from './UserSettings.vue'
         },
         getCurrentLocation(){
           return this.navigationStore.currentLocation;
+
         }
     }
 }
 </script>
   
 <style scoped>
+p {
+  margin-bottom:0px;
+}
 .card {
     width: fit-content; 
     height: fit-content;

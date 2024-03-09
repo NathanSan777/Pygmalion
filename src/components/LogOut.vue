@@ -1,16 +1,7 @@
 <template>
     <div class="card">
-      <div class="card-body">
-          <h1>My Journal</h1>
-          <button class="btn btn-primary">New Entry</button>
-          <p v-if="journalEntries.length == 0"> You currently have no entries.</p>
-        </div>
-        <div class="overflow-auto">
-          <div class="mt-3">
-            <b-pagination v-model="currentPage" pills :total-rows="perPage"></b-pagination>
-          </div>
-        </div>
-      </div>
+          <p>Are you sure you want to log out?</p>
+    </div>
 </template>
 
 <script>
@@ -20,16 +11,14 @@ export default {
     data() {
       return {
         currentUser: null,
-        userDataDoc: null,
-        journalEntries: [],
-        perPage: 10,
-        currentPage: 1
+        userDataDoc: null
       }
     },
 }
+
 </script>
 
-<style scoped>
+<style>
 .card {
     width: fit-content; 
     height: fit-content;
@@ -38,12 +27,6 @@ export default {
     backdrop-filter: blur(30px); 
     border: none; padding: 10px;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
-}
-.card-body{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 .btn, .btn-primary{
     background-color: transparent;
@@ -55,9 +38,5 @@ export default {
     display: block;  
     margin: auto;
     box-shadow: 0 0 30px rgba(182, 208, 226, 0.2);
-}
-.btn:hover{
-    background-color: rgba(0, 0, 0, 0.1);
-    transition: 1s;
 }
 </style>

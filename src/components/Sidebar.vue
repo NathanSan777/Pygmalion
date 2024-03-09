@@ -16,7 +16,7 @@
             <div class="button-format">
                 <div class="button-styling" >
                     <button class="sidebar-button check-in" @click="handleButtonClick('checkIn')">
-                        <span class="material-symbols-outlined" id="icon" style="margin-right:2px; font-size: 45px;">check_circle</span>
+                        <span class="material-symbols-outlined" id="icon" style="margin-right:2px; font-size: 30px;">check_circle</span>
                         <li>Check-In</li>
                     </button>
                 </div>
@@ -25,7 +25,7 @@
             <div class="button-format">
                 <div class="button-styling">
                     <button class="sidebar-button journal" @click="handleButtonClick('journal')">
-                        <span class="material-symbols-outlined" id="icon" style="margin-right:2px; font-size: 45px;">book</span>
+                        <span class="material-symbols-outlined" id="icon" style="margin-right:2px; font-size: 30px;">book</span>
                         <li>Journal</li>
                     </button>
                 </div>
@@ -34,7 +34,7 @@
             <div class="button-format">
                 <div class="button-styling">
                     <button class="sidebar-button statistics" @click="handleButtonClick('statistics')">
-                        <span class="material-symbols-outlined" id="icon" style="margin-right:2px; font-size: 45px;">bar_chart</span>
+                        <span class="material-symbols-outlined" id="icon" style="margin-right:2px; font-size: 30px;">bar_chart</span>
                         <li>Statistics</li>
                     </button>
                 </div>
@@ -43,7 +43,7 @@
             <div class="button-format">
                 <div class="button-styling">
                     <button class="sidebar-button breathe" @click="handleButtonClick('breathe')">
-                        <span class="material-symbols-outlined" id="icon" style="margin-right:2px;font-size: 45px; ">airwave</span>
+                        <span class="material-symbols-outlined" id="icon" style="margin-right:2px;font-size: 30px; ">airwave</span>
                         <li>Breathe</li>
                     </button>
                 </div>
@@ -52,7 +52,7 @@
             <div class="button-format">
                 <div class="button-styling">
                     <button class="sidebar-button forum" @click="handleButtonClick('forum')">
-                        <span class="material-symbols-outlined" id="icon" style="margin-right:2px;font-size: 45px; ">forum</span>
+                        <span class="material-symbols-outlined" id="icon" style="margin-right:2px;font-size: 30px; ">forum</span>
                         <li>Forum</li>
                     </button>
                 </div>
@@ -61,8 +61,16 @@
             <div class="button-format">
                 <div class="button-styling">
                     <button class="sidebar-button settings" @click="handleButtonClick('userSettings')">
-                        <span class="material-symbols-outlined" id="icon" style="margin-right:2px;font-size: 45px; ">settings</span>
+                        <span class="material-symbols-outlined" id="icon" style="margin-right:2px;font-size: 30px; ">settings</span>
                         <li>Settings</li>
+                    </button>
+                </div>
+            </div>
+            <div class="button-format">
+                <div class="button-styling">
+                    <button class="sidebar-button logout" @click="handleButtonClick('logout')">
+                        <span class="material-symbols-outlined" id="icon" style="margin-right:2px;font-size: 30px; ">logout</span>
+                        <li>Log Out</li>
                     </button>
                 </div>
             </div>
@@ -73,6 +81,7 @@
 
 <script>
 import { useNavigationStore } from '../stores/navigationStore'
+import { useStoreAuth } from '../stores/storeAuth';
 
 
 export default {
@@ -163,6 +172,9 @@ export default {
 }
 .sidebar-button.settings:hover{
     background-color:grey; 
+}
+.sidebar-button.logout:hover{
+    background-color:orange; 
 }
 .sidebar-button:active,
 .sidebar-button.selected {
