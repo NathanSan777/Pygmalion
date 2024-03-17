@@ -10,11 +10,12 @@
   "dependencies": {
     "@vueuse/core": "^10.8.0",
     "bootstrap": "^5.3.3",
+    "bootstrap-vue": "^2.23.1",
     "chart.js": "^4.4.1",
     "firebase": "^10.8.0",
     "fullcalendar": "^6.1.11",
     "pinia": "^2.1.7",
-    "vue": "^3.3.4",
+    "vue": "^3.4.21",
     "vue-router": "^4.2.5"
   },
   "devDependencies": {

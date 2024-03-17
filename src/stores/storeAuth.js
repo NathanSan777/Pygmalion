@@ -1,9 +1,11 @@
 import { defineStore } from "pinia";
 import { auth } from "../Firebase/init.js"
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { query, where, doc, addDoc, collection, getDocs, onSnapshot } from 'firebase/firestore';
+import { query, where, doc, addDoc, collection, getDoc, getDocs, onSnapshot } from 'firebase/firestore';
 import db from '../Firebase/init.js'
 import { useNavigationStore } from "./navigationStore.js";
+import { useJournalStore } from "./journalStore.js";
+import { useCheckInStore } from "./CheckInStore.js";
 
 export const useStoreAuth = defineStore("storeAuth", {
     id: 'auth',
@@ -82,6 +84,23 @@ export const useStoreAuth = defineStore("storeAuth", {
                 throw error;
             }
         },
+        async fetchUserDocRef(userId){
+            try {
+                const q = query(collection(db, "users"), where("uid", "==", userId));
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    const userDocSnapshot = querySnapshot.docs[0];
+                    return userDocSnapshot.ref; // Return the document reference instead of the data
+                } else {
+                    console.error("User data not found for user ID: ", userId);
+                    return null;
+                }
+            } catch (error) {
+                console.error("Error fetching user data: ", error);
+                throw error;
+            }
+
+        },
 
         async initializeAuthState(){
             auth.onAuthStateChanged(user => {
@@ -108,6 +127,70 @@ export const useStoreAuth = defineStore("storeAuth", {
                 console.log("User logged out.")
             } catch(error) {
                 console.error("Failed to log out user",  error);
+                throw error;
+            }
+        },
+            async addCheckInToFirestore(checkInData){
+                try {
+                    const user = auth.currentUser;
+                    console.log("User obtained");
+                    if (user){
+                        const userDocRef = await this.fetchUserDocRef(user.uid);
+                        if (userDocRef){
+                            const checkInsCollectionRef = collection(userDocRef, 'checkIns');
+                            await addDoc(checkInsCollectionRef, checkInData);
+                            console.log("Check-in data added to Firestore: ", checkInData);
+                        }
+                        else{
+                            console.error("User document not found for user ID: " + user.uid);
+                        }
+                    } else {
+                        console.error("No user is currently logged in.");
+                    }
+                } catch(error) {
+                    console.error("Error adding check-in data: ", error);
+                    throw error;
+            }
+          },
+        async addJournalEntry(entryData) {
+            try {
+                const user = auth.currentUser;
+                if(!user){
+                    throw new Error("No user is currently logged in...")
+                }
+                const userDocRef = await this.fetchUserDocRef(user.uid);
+                if (!userDocRef){
+                    throw new Error("User document not found for user ID: " + user.uid)
+                }
+                const journalEntriesCollectionRef = collection(userDocRef, 'journalEntries');
+                await addDoc(journalEntriesCollectionRef, entryData);
+                console.log("Journal entry added to Firestore: ", entryData);
+                useJournalStore().hideJournalEntry();
+            } catch(error){
+                console.error("Error adding journal entry:  ", error);
+                throw error;
+            }    
+        },
+        async getJournalEntries(){
+            try {
+                const user = auth.currentUser;
+                if (user){
+                    const userDocRef = await this.fetchUserDocRef(user.uid);
+                    if (userDocRef){
+                        const journalEntriesCollectionRef = collection(userDocRef, 'journalEntries');
+                        const querySnapshot = await getDocs(journalEntriesCollectionRef);
+                        const entries = [];
+                        querySnapshot.forEach((doc) => {
+                            entries.push({ id: doc.id, ...doc.data()});
+                        });
+                        return entries;
+                    } else {
+                        console.error("User document not found for userID: " + user.uid);
+                        return [];
+                    }
+                }
+            } catch(error) {
+                console.error("Error fetching journal entries: ", error);
                 throw error;
             }
         }

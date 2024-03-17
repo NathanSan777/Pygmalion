@@ -1,9 +1,22 @@
 <template>
+  <div v-if="!showNewEntry">
     <div class="card">
       <div class="card-body">
           <h1>My Journal</h1>
-          <button class="btn btn-primary">New Entry</button>
-          <p v-if="journalEntries.length == 0"> You currently have no entries.</p>
+          <button @click="createNewJournalEntry" class="btn btn-primary">New Entry</button>
+          <br>
+          <p v-if="userJournalEntries.length === 0"> You currently have no entries.</p>
+          <div v-else>
+            <div v-for="entry in fetchedJournalEntries" :key="entry.id">
+              <!-- Display journal entry details -->
+              <div class="card">
+                <div class="card-body" style="display: flex; flex-direction: row;">
+                  <p>Title: {{ entry.journalTitle }}</p>
+                  <p>Date: {{ entry.journalDate }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="overflow-auto">
           <div class="mt-3">
@@ -11,21 +24,64 @@
           </div>
         </div>
       </div>
+    </div>
+      <div v-if="showNewEntry">
+        <div class="card-body">
+        <JournalEntry>
+
+        </JournalEntry>
+      </div>
+      </div>
 </template>
 
 <script>
 import { useStoreAuth } from '../stores/storeAuth'
-
+import { useJournalStore } from '../stores/journalStore';
+import JournalEntry from './JournalEntry.vue';
 export default {
-    data() {
+ 
+  data() {
       return {
-        currentUser: null,
-        userDataDoc: null,
-        journalEntries: [],
-        perPage: 10,
-        currentPage: 1
+        showNewEntry: false,
+        userJournalEntries: []
       }
     },
+    components: {
+      JournalEntry
+    },
+
+    computed: {
+    fetchedJournalEntries() {
+      return useJournalStore().journalEntries;
+      },
+
+    perPage() {
+      return useJournalStore().perPage;
+      },
+
+    currentPage() {
+      return useJournalStore().currentPage;
+      },
+    showNewEntry(){
+        return useJournalStore().showNewEntry;
+      }
+    },
+    methods: {
+      createNewJournalEntry(){
+        useJournalStore().createNewJournalEntry();
+      },
+      // async fetchEntries(){
+      //   try {
+          
+      //     console.log("Journal entries:", journalEntries);
+      //   } catch(error){
+      //     console.error("Error fetching journal entries:", error);
+      //   }
+      // } 
+    },
+    created() {
+    this.userJournalEntries = useJournalStore().fetchJournalEntries();
+    }
 }
 </script>
 

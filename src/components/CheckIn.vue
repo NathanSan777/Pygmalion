@@ -4,19 +4,19 @@
     <h1>Daily Check-In</h1>
     <h6>How was your day today?</h6>
     <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-      <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" v-model="dayStatus">
+      <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" v-model="dayStatus" value="Bad...">
       <label class="btn btn-outline-primary" for="btnradio1" >Bad...</label>
 
-      <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" v-model="dayStatus">
+      <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" v-model="dayStatus" value="Okay">
       <label class="btn btn-outline-primary" for="btnradio2">Okay</label>
 
-      <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off" v-model="dayStatus">
+      <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off" v-model="dayStatus" value="Decent">
       <label class="btn btn-outline-primary" for="btnradio3">Decent</label>
 
-      <input type="radio" class="btn-check" name="btnradio" id="btnradio4" autocomplete="off" v-model="dayStatus">
+      <input type="radio" class="btn-check" name="btnradio" id="btnradio4" autocomplete="off" v-model="dayStatus" value="Well">
       <label class="btn btn-outline-primary" for="btnradio4">Well</label>
 
-      <input type="radio" class="btn-check" name="btnradio" id="btnradio5" autocomplete="off" v-model="dayStatus" >
+      <input type="radio" class="btn-check" name="btnradio" id="btnradio5" autocomplete="off" v-model="dayStatus" value="Great!" >
       <label class="btn btn-outline-primary" for="btnradio5">Great!</label>
      </div>
      <br> 
@@ -26,6 +26,11 @@
       <label class="form-check-label" :class="{ 'checked': medsTaken}" for="flexSwitchCheckDefault">{{ medsTaken ? 'Yes, I have.' : 'No, I have not.' }}</label>
     </div>
     <br>
+    <h6>How many hours of sleep did you get last night?</h6>
+    <div class="form-group">
+      <input type="number" min="0" max="24" class="form-control" id="userInputForm" placeholder="Hours of sleep" v-model="hoursOfSleep"/>
+    </div>
+    <br>
     <h6>Write one thing you think went well today.</h6>
     <div class="form-group">
       <input type="text" class="form-control" id="userInputForm" placeholder="Something positive!" v-model="userPositiveThing"/>
@@ -33,10 +38,10 @@
     <br>
     <h6>Write one thing you think you could improve on for tomorrow.</h6>
     <div class="form-group">
-      <input type="text" class="form-control" id="userInputForm" placeholder="Something to improve on" v-model="userImprovementThing">
+      <input type="text" class="form-control" id="userInputForm" placeholder="Something to improve on"  v-model="userImprovementThing">
     </div>
     <br>
-    <button class="btn btn-primary" id="submitButton" :disabled="!isCheckInComplete" >
+    <button class="btn btn-primary" id="submitButton" @click="submitCheckIn()" :disabled="!checkInStore.isCheckInComplete" >
       Submit
     </button>
   </div>
@@ -46,31 +51,132 @@
 
 <script>
 import { useStoreAuth } from '../stores/storeAuth'
+import { useCheckInStore } from '../stores/CheckInStore';
+import { computed, watch } from 'vue'
 
 export default {
-    data() {
-      return {
-        currentUser: null,
-        userDataDoc: null,
-        dayStatus: "",
-        medsTaken: false,
-        userPositiveThing: "",
-        userImprovementThing: "",
+  setup() {
+    const checkInStore = useCheckInStore();
+
+    const dayStatus = computed({
+      get: () => checkInStore.dayStatus,
+      set: (value) => {
+        if (value){
+          checkInStore.dayStatus = value;
+        }
       }
-    },
-    computed: {
-      isCheckInComplete(){
-        if ( this.dayStatus == ""
-        || this.userPositiveThing == ""
-        || this.userImprovementThing == ""){
-          return false;
-        }
-        else{
-          return true;
-        }
+    });
+    watch(() => dayStatus.value, (newValue) => {
+      checkInStore.dayStatus = newValue;
+    });
+
+    const medsTaken = computed({
+      get: () => checkInStore.medsTaken,
+      set: (value) => {
+        checkInStore.medsTaken = value;
+      }
+    });
+    watch(() => medsTaken.value, (newValue) => {
+      checkInStore.medsTaken = newValue;
+    });
+
+    const hoursOfSleep = computed({
+      get: () => checkInStore.hoursOfSleep,
+      set: (value) => {
+        checkInStore.hoursOfSleep = value;
+      }
+    });
+    watch(() => hoursOfSleep.value, (newValue) => {
+      checkInStore.hoursOfSleep = newValue;
+    });
+
+    const userPositiveThing = computed({
+      get: () => checkInStore.userPositiveThing,
+      set: (value) => {
+        checkInStore.userPositiveThing = value;
+      }
+    });
+
+    watch(() => userPositiveThing.value, (newValue) => {
+      checkInStore.userPositiveThing = newValue;
+    });
+
+    const userImprovementThing = computed({
+      get: () => checkInStore.userImprovementThing,
+      set: (value) => {
+        checkInStore.userImprovementThing = value;
+      }
+    });
+    watch(() => userImprovementThing.value, (newValue) => {
+      checkInStore.userImprovementThing = newValue;
+    });
+    return {
+      checkInStore,
+      useStoreAuth,
+      dayStatus,
+      medsTaken,
+      hoursOfSleep,
+      userPositiveThing,
+      userImprovementThing
+    }
+  },
+  methods: {
+    submitCheckIn(){
+      console.log("Submit button clicked!")
+        const checkInData = {
+          dayStatus: this.checkInStore.dayStatus,
+          medsTaken: this.checkInStore.medsTaken,
+          hoursOfSleep: this.checkInStore.hoursOfSleep,
+          userPositiveThing: this.checkInStore.userPositiveThing,
+          userImprovementThing: this.checkInStore.userImprovementThing,
+          timestamp: new Date(),
+        };
+        console.log("Document constructed. Attempting to add.");
+        useStoreAuth().addCheckInToFirestore(checkInData);
+        this.checkInStore.clearFields();
       }
     }
-}
+  }
+
+
+
+    // data() {
+    //   return {
+    //     dayStatus: "",
+    //     medsTaken: false,
+    //     hoursOfSleep: 0,
+    //     userPositiveThing: "",
+    //     userImprovementThing: "",
+    //   }
+    // },
+    // methods: {
+    //   printSubmit(){
+    //     console.log("User's day was: " + this.dayStatus);
+    //     console.log("Did the user take their meds today? " + this.medsTaken);
+    //     console.log("User's amount of sleep: " + this.hoursOfSleep + " hour(s)");
+    //     console.log("User's positive thing: " + this.userPositiveThing);
+    //     console.log("User's thing to improve on: " + this.userImprovementThing);
+    //     this.dayStatus = "";
+    //     this.medsTaken = false;
+    //     this.hoursOfSleep = 0;
+    //     this.userPositiveThing = "";
+    //     this.userImprovementThing = "";
+    //     alert("Your submission has been recorded!");
+    //   }
+
+    // },
+    // computed: {
+    //   isCheckInComplete(){
+    //     if ( this.dayStatus == ""
+    //     || this.userPositiveThing == ""
+    //     || this.userImprovementThing == ""){
+    //       return false;
+    //     }
+    //     else{
+    //       return true;
+    //     }
+    //   }
+    // }
 </script>
 
 <style scoped>
@@ -81,6 +187,7 @@ p{
 
 input{
   align-self: center;
+  text-align: center;
 }
 .form-control {
     background:transparent;
