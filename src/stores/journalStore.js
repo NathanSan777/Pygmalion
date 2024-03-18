@@ -6,7 +6,7 @@ export const useJournalStore = defineStore('journal', {
   state: () => ({
     showNewEntry: false,
     journalEntries: [],
-    perPage: 10,
+    perPage: 5,
     currentPage: 1
   }),
   actions: {
@@ -22,7 +22,15 @@ export const useJournalStore = defineStore('journal', {
     },
     async fetchJournalEntries(){
         const entries = await useStoreAuth().getJournalEntries();
-        this.journalEntries = entries;
+        console.log("Checking to see if this is an array: ", Array.isArray(entries));
+        console.log("Inside journalStore.js. Fetched journal entries: ",entries)
+        if (Array.isArray(entries)) {
+            this.journalEntries = entries;
+        } else{
+            console.error("Invalid journal entries format: ", entries);
+            this.journalEntries = [];
+        }
+        
     }
   }
 });

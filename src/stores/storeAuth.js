@@ -181,8 +181,10 @@ export const useStoreAuth = defineStore("storeAuth", {
                         const querySnapshot = await getDocs(journalEntriesCollectionRef);
                         const entries = [];
                         querySnapshot.forEach((doc) => {
-                            entries.push({ id: doc.id, ...doc.data()});
+                            entries.push(doc.data());
                         });
+                        console.log("Journal entries retrieved in storeAuth.js:", entries)
+                        console.log(Array.isArray(entries));
                         return entries;
                     } else {
                         console.error("User document not found for userID: " + user.uid);
@@ -191,6 +193,33 @@ export const useStoreAuth = defineStore("storeAuth", {
                 }
             } catch(error) {
                 console.error("Error fetching journal entries: ", error);
+                throw error;
+            }
+        },
+        async getJournalEntriesForDate(date){
+            try {
+                const user = auth.currentUser;
+                if(user){
+                    const userDocRef = await this.fetchUserDocRef(user.uid);
+                    if (userDocRef){
+                        const journalEntriesCollectionRef = collection(userDocRef, 'journalEntries');
+                        const querySnapshot = await getDocs(query(journalEntriesCollectionRef, where('date', '==', date)));
+                        const entries = [];
+                        querySnapshot.forEach((doc) => {
+                            entries.push(doc.data());
+                        });
+                        console.log("Journal entries retrieved for date " + date + ":", entries);
+                        return entries;
+                    } else{
+                        console.error("User document not found for user ID:  " + user.uid);
+                        return [];
+                    }
+                } else {
+                    console.error("No user is currently logged in.");
+                    return [];
+                }
+            } catch (error) {
+                console.error("Error fetching journal entries for date " + date + ":", error);
                 throw error;
             }
         }

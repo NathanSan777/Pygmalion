@@ -8,6 +8,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fullcalendar/core": "^6.1.11",
+    "@fullcalendar/daygrid": "^6.1.11",
+    "@fullcalendar/vue3": "^6.1.11",
     "@vueuse/core": "^10.8.0",
     "bootstrap": "^5.3.3",
     "bootstrap-vue": "^2.23.1",
