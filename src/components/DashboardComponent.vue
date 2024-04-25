@@ -8,6 +8,7 @@
       <div v-if="hasCurrentUser != null">
         <div class="card">
           <p v-if="userDataDoc" style="margin-bottom: none;">Welcome, {{ userDataDoc.username }}!</p>
+          <p v-if="!hasCheckedIn">You still need to check in!</p>
         </div>
       </div>
       <div v-else>
@@ -15,7 +16,12 @@
       </div>
       <br>
       <div v-if="getCurrentLocation === 'checkIn'">
+        <div v-if="!hasCheckedIn">
         <CheckIn></CheckIn>
+        </div>
+        <div v-else class="card">
+          <p>You've already logged in today.</p>
+        </div>
       </div>
       <div v-else-if="getCurrentLocation === 'journal'">
         <Journal></Journal>
@@ -106,7 +112,9 @@ import LogOut from "./LogOut.vue";
         },
         getCurrentLocation(){
           return this.navigationStore.currentLocation;
-
+        },
+        hasCheckedIn() {
+          return useStoreAuth().hasCheckedIn;
         }
     }
 }

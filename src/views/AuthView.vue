@@ -186,7 +186,6 @@
     transition: 1s;
 }
 
-
 .input-box {
     justify-content: right;
     display: flex;

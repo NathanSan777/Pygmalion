@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { auth } from "../Firebase/init.js"
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { query, where, doc, addDoc, collection, getDoc, getDocs, onSnapshot } from 'firebase/firestore';
+import { query, where, doc, addDoc,updateDoc, collection, getDoc, getDocs, onSnapshot } from 'firebase/firestore';
 import db from '../Firebase/init.js'
 import { useNavigationStore } from "./navigationStore.js";
 import { useJournalStore } from "./journalStore.js";
@@ -11,8 +11,12 @@ export const useStoreAuth = defineStore("storeAuth", {
     id: 'auth',
     state: () => ({
        isLoggedIn: false,
+       hasCheckedIn: false,
        user: null,
-       userData: null
+       userData: null,
+       userProfileColor: "",
+       userBackground: ''
+
     }),
 
     actions: {
@@ -54,6 +58,20 @@ export const useStoreAuth = defineStore("storeAuth", {
                 if (userData){
                     this.userData = userData;
                     console.log("Data fetched: ", userData);
+                    // After fetching user data, also fetch user settings
+                    const userSettings = await this.fetchUserSettings(user.uid);
+                    if (userSettings) {
+                        this.userSettings = userSettings;
+                        console.log("User settings fetched: ", userSettings);
+                    } else {
+                        console.error("User settings not found for user ID:", user.uid);
+                    }
+                    const checkInToday = await this.getCheckInForToday();
+                    if (checkInToday) {
+                        this.hasCheckedIn = true;
+                    } else {
+                        this.hasCheckedIn = false;
+                    }
                 }
                 else{
                     console.error("User data not found for user ID:", user.uid)
@@ -103,10 +121,18 @@ export const useStoreAuth = defineStore("storeAuth", {
         },
 
         async initializeAuthState(){
-            auth.onAuthStateChanged(user => {
+            auth.onAuthStateChanged(async user => {
                 if (user) {
+                    console.log("Inside the auth state: logged in.")
                     this.isLoggedIn = true;
                     this.user = user;
+                    try {
+                        this.userData = await this.fetchUserData(user.uid);
+                        //this.userSettings = await this.fetchUserSettings();
+                    } catch (error) {
+                        console.error('Error fetching user data or settings:', error);
+                        // Handle error as needed
+                    }
                 }
                 else{
                     this.isLoggedIn = false;
@@ -152,6 +178,65 @@ export const useStoreAuth = defineStore("storeAuth", {
                     throw error;
             }
           },
+        async getCheckInForToday(){
+            try {
+                const user = auth.currentUser;
+                if (!user) {
+                    throw new Error("No user is currently logged in");
+                }
+
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                const userDocRef = await this.fetchUserDocRef(user.uid);
+                if (!userDocRef) {
+                    console.error("User document not found for user ID: ", user.uid);
+                    return null;
+                }
+
+                const checkInsCollectionRef = collection(userDocRef, 'checkIns');
+                const querySnapshot = await getDocs(query(checkInsCollectionRef, where("timestamp", ">=", today)));
+                if (!querySnapshot.empty) {
+                    // A check-in exists for today
+                    console.log("User has checked in today!")
+                    return querySnapshot.docs[0].data();
+                } else {
+                    // No check-in exists for today
+                    console.log("User has not checked in today...");
+                    return null;
+                }
+            } catch (error) {
+                console.error("Error fetching check-in for today: ", error);
+                throw error;
+            }
+        },
+        async getCheckIns(){
+            try {
+                const user = auth.currentUser;
+                if (!user) {
+                    throw new Error("No user is currently logged in");
+                }
+                const userDocRef = await this.fetchUserDocRef(user.uid);
+                if (userDocRef){
+                    const checkInsCollectionRef = collection(userDocRef, 'checkIns');
+                    const querySnapshot = await getDocs(checkInsCollectionRef);
+                    const checkIns = [];
+                    querySnapshot.forEach((doc) => {
+                        checkIns.push(doc.data());
+                    });
+                    console.log("Check-ins retrieved in storeAuth:", checkIns);
+                    return checkIns;
+                }
+                else{
+                    console.error("User document not found for userID: " + user.uid);
+                    return [];
+                }
+            } catch (error) {
+                console.error("Error fetching check-ins:", error);
+                throw error;
+            }
+        },
+
         async addJournalEntry(entryData) {
             try {
                 const user = auth.currentUser;
@@ -222,8 +307,72 @@ export const useStoreAuth = defineStore("storeAuth", {
                 console.error("Error fetching journal entries for date " + date + ":", error);
                 throw error;
             }
+        },
+
+        async updateUserSettings(profileColor, background) {
+            try {
+                const user = auth.currentUser;
+                if (!user) {
+                    throw new Error("No user is currently logged in");
+                }
+                
+                const userDocRef = await this.fetchUserDocRef(user.uid);
+                const userSettingsCollectionRef = collection(userDocRef, 'userSettings');
+                const querySnapshot = await getDocs(userSettingsCollectionRef);
+                if (!querySnapshot.empty){
+                    const userSettingDocRef =  querySnapshot.docs[0].ref;
+
+                    await updateDoc(userSettingDocRef, {
+                        profileColor,
+                        background
+                    });
+                // Update local state
+                this.userSettings = { profileColor, background };
+
+                console.log('User settings updated successfully');
+                console.log("User settings fetched in storeAuth: ", this.userSettings);
+                } else {
+                    console.error("No user settings document found...");
+                }
+            } catch (error) {
+                console.error('Error updating user settings:', error);
+                throw error;
+            }
+        },
+
+        async fetchUserSettings(){
+            try {
+                const user = auth.currentUser;
+                if (!user) {
+                    throw new Error("No user is currently logged in");
+                }
+                const userDocRef = await this.fetchUserDocRef(user.uid);
+                console.log("User doc ref is ", userDocRef)
+                const userSettingCollectionRef = collection(userDocRef, 'userSettings');
+                const querySnapshot = await getDocs(userSettingCollectionRef);
+                console.log("Query snapshot is ",querySnapshot);
+
+                if (!querySnapshot.empty){
+
+                    const userSettingsDocSnapshot = querySnapshot.docs[0];
+                    const userSettingsData = userSettingsDocSnapshot.data();
+                    console.log(userSettingsData);
+                    this.userSettings = userSettingsData;
+                    console.log("User settings fetched in storeAuth:", userSettingsData);
+                    this.userProfileColor = userSettingsData.profileColor;
+                    this.background = userSettingsData.background;
+                    console.log(this.userProfileColor, this.background);
+                    return userSettingsData;
+                }
+                else {
+                    console.error("No settings found.");
+                }
+        } catch (error){
+            console.error("Error fetching user settings:", error);
+            throw error;
         }
-    },
+    }
+},
     
     getters: {
         getLogInStatus(){

@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-    <div class="card-body">
+    <div class="card-body" v-if="!checkInStatus">
     <h1>Daily Check-In</h1>
     <h6>How was your day today?</h6>
     <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
@@ -45,6 +45,9 @@
       Submit
     </button>
   </div>
+  <div v-else>
+    <p>You've already checked in today!</p>
+  </div>
 </div>
 
 </template>
@@ -57,6 +60,10 @@ import { computed, watch } from 'vue'
 export default {
   setup() {
     const checkInStore = useCheckInStore();
+
+    const checkInStatus = computed(() => {
+      return useStoreAuth.hasCheckedIn;
+    });
 
     const dayStatus = computed({
       get: () => checkInStore.dayStatus,
@@ -112,6 +119,7 @@ export default {
     });
     return {
       checkInStore,
+      checkInStatus,
       useStoreAuth,
       dayStatus,
       medsTaken,
@@ -137,46 +145,6 @@ export default {
       }
     }
   }
-
-
-
-    // data() {
-    //   return {
-    //     dayStatus: "",
-    //     medsTaken: false,
-    //     hoursOfSleep: 0,
-    //     userPositiveThing: "",
-    //     userImprovementThing: "",
-    //   }
-    // },
-    // methods: {
-    //   printSubmit(){
-    //     console.log("User's day was: " + this.dayStatus);
-    //     console.log("Did the user take their meds today? " + this.medsTaken);
-    //     console.log("User's amount of sleep: " + this.hoursOfSleep + " hour(s)");
-    //     console.log("User's positive thing: " + this.userPositiveThing);
-    //     console.log("User's thing to improve on: " + this.userImprovementThing);
-    //     this.dayStatus = "";
-    //     this.medsTaken = false;
-    //     this.hoursOfSleep = 0;
-    //     this.userPositiveThing = "";
-    //     this.userImprovementThing = "";
-    //     alert("Your submission has been recorded!");
-    //   }
-
-    // },
-    // computed: {
-    //   isCheckInComplete(){
-    //     if ( this.dayStatus == ""
-    //     || this.userPositiveThing == ""
-    //     || this.userImprovementThing == ""){
-    //       return false;
-    //     }
-    //     else{
-    //       return true;
-    //     }
-    //   }
-    // }
 </script>
 
 <style scoped>

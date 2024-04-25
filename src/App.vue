@@ -1,6 +1,7 @@
 <template>
   <video autoplay muted loop id="backgroundVideo">
-    <source src="./assets/beach.mp4" type="video/mp4">
+    <!-- <source src="./assets/beach.mp4" type="video/mp4"> -->
+    <source v-for="(source, index) in videoSources" :key="index" :src="source.src" :type="source.type">
   </video>
 
   <template v-if="!authStore.isLoggedIn">
@@ -15,7 +16,7 @@
 </template>
 
 <script>
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter, RouterLink, RouterView } from 'vue-router'
 import { useStoreAuth } from './stores/storeAuth'
 import DashboardComponent from './components/DashboardComponent.vue';
@@ -29,10 +30,42 @@ export default {
   setup() {
     const authStore = useStoreAuth();
     const router = useRouter();
-    onMounted(() => {
-      router.push('/auth')
-    })
-    return { router, authStore };
+
+    const backgroundVideoSource = ref('/src/assets/beach.mp4');
+    const videoSources = [
+      {src: '/src/assets/beach.mp4', type: 'video/mp4'},
+      {src: '/src/assets/forest.mp4', type: 'video/mp4'},
+      {src: '/src/assets/snowy.mp4', type: 'video/mp4'},
+      {src: '/src/assets/sunset.mp4', type: 'video/mp4'},
+      {src: '/src/assets/mountains.mp4', type: 'video/mp4'},
+      {src: '/src/assets/lake.mp4', type: 'video/mp4'}
+    ];
+
+    onMounted(async () => {
+      if (!authStore.isLoggedIn){
+        router.push('/auth')
+      } else {
+        // Fetch user's background variable from Firebase
+        const userBackground = authStore.background;
+        // Set the background video source based on the user's background
+        if (userBackground === 'Forest') {
+          backgroundVideoSource.value =  '/src/assets/forest.mp4';
+        } 
+        else if (userBackground === 'Snowy') {
+          backgroundVideoSource.value = '/src/assets/snowy.mp4';
+        }
+        else if (userBackground === 'Sunset') {
+          backgroundVideoSource.value = '/src/assets/sunset.mp4';
+        }
+        else if (userBackground === 'Mountains') {
+          backgroundVideoSource.value = '/src/assets/mountains.mp4';
+        }
+        else {
+          backgroundVideoSource.value = '/src/assets/lake.mp4';
+        }
+      }
+    });
+    return { router, authStore, backgroundVideoSource, videoSources };
   },
 }
 
