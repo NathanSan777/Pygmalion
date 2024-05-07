@@ -19,6 +19,7 @@
 import { onMounted, ref } from 'vue'
 import { useRouter, RouterLink, RouterView } from 'vue-router'
 import { useStoreAuth } from './stores/storeAuth'
+import { useForumStore } from './stores/forumStore';
 import DashboardComponent from './components/DashboardComponent.vue';
 
 export default {

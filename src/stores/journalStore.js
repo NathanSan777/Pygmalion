@@ -23,7 +23,7 @@ export const useJournalStore = defineStore('journal', {
     async fetchJournalEntries(){
         const entries = await useStoreAuth().getJournalEntries();
         console.log("Checking to see if this is an array: ", Array.isArray(entries));
-        console.log("Inside journalStore.js. Fetched journal entries: ",entries)
+        console.log("Inside journalStore.js. Fetched journal entries: ", entries)
         if (Array.isArray(entries)) {
             this.journalEntries = entries;
         } else{
